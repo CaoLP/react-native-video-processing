@@ -208,7 +208,12 @@ public class Trimmer {
       Matrix mx = new Matrix();
 
       mx.postScale(scaleWidth, scaleHeight);
-      mx.postRotate(orientation - 360);
+       if ( orientation != 0 ) {
+        // Matrix matrix = new Matrix();
+        matrix.postRotate(orientation);
+      }
+
+      //mx.postRotate(orientation - 360);
 
       for (int i = 0; i < duration; i += duration / 10) {
         Bitmap frame = retriever.getFrameAtTime(i * 1000);
