@@ -210,7 +210,7 @@ public class Trimmer {
       mx.postScale(scaleWidth, scaleHeight);
        if ( orientation != 0 ) {
         // Matrix matrix = new Matrix();
-        matrix.postRotate(orientation);
+        mx.postRotate(orientation);
       }
 
       //mx.postRotate(orientation - 360);
@@ -555,13 +555,22 @@ public class Trimmer {
       int height = Integer.parseInt(retriever.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
       int orientation = Integer.parseInt(retriever.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
 
+      
       float aspectRatio = (float)width / (float)height;
+      //  if ( orientation != 0 ) {
+      //    aspectRatio = (float)height / (float)width ;
+      //  }
 
       int resizeHeight = 100;
       int resizeWidth = Math.round(resizeHeight * aspectRatio);
 
       float scaleWidth = ((float) resizeWidth) / width;
       float scaleHeight = ((float) resizeHeight) / height;
+
+      //  if ( orientation != 0 ) {
+      //     scaleWidth = ((float) resizeHeight) / height;
+      //     scaleHeight = ((float) resizeWidth) / width;
+      //  }
 
       Log.d(TrimmerManager.REACT_PACKAGE, "getPreviewImages: \n\tduration: " + duration +
               "\n\twidth: " + width +
@@ -574,22 +583,19 @@ public class Trimmer {
 
       Matrix mx = new Matrix();
 
-      mx.postScale(scaleWidth, scaleHeight);
-      
-      
       if ( orientation != 0 ) {
         // Matrix matrix = new Matrix();
         mx.postRotate(orientation);
       }
-      
-      //mx.postRotate(orientation - 360);
+
+      // mx.postRotate(orientation - 360);
 
       for (int i = (int) startTime; i < (int) endTime; i += step ) {
         Bitmap frame = retriever.getScaledFrameAtTime((long) i * 1000000, resizeWidth, resizeHeight);
-
         if (frame == null) {
           continue;
         }
+        frame = Bitmap.createBitmap(frame, 0, 0, frame.getWidth(), frame.getHeight(), mx, true);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         frame.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
